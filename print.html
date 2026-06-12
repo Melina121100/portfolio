@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Melina Valdata — Portfolio Print</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9pt;
+      color: #111;
+      background: #fff;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .print-btn {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 11px; letter-spacing: 0.06em;
+      background: #111; color: #fff;
+      border: none; padding: 10px 20px; cursor: pointer;
+    }
+    @media print { .print-btn { display: none; } }
+
+    /* ── Every page ── */
+    .page {
+      width: 297mm;
+      height: 210mm;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+    .page:last-child { page-break-after: avoid; }
+
+    /* Running footer: name left, year right */
+    .page-footer {
+      position: absolute;
+      bottom: 8mm;
+      left: 18mm;
+      right: 18mm;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #111;
+    }
+
+    /* Running header for project pages */
+    .page-header {
+      position: absolute;
+      top: 8mm;
+      left: 18mm;
+      right: 18mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 7.5pt;
+      color: #111;
+      border-bottom: 0.3pt solid #111;
+      padding-bottom: 3pt;
+    }
+    .page-header .h-num { font-weight: 700; margin-right: 6pt; }
+    .page-header .h-title { font-weight: 700; }
+    .page-header .h-cat { color: #111; }
+    .page-header .h-year { }
+    .page-header .h-pnum { }
+
+    /* ── Cover page ── */
+    .page-cover .page-footer { font-size: 7.5pt; }
+    .cover-name {
+      position: absolute;
+      bottom: 8mm;
+      left: 18mm;
+      font-size: 7.5pt;
+      font-weight: 700;
+    }
+    .cover-year {
+      position: absolute;
+      bottom: 8mm;
+      right: 18mm;
+      font-size: 7.5pt;
+      font-weight: 400;
+    }
+
+    /* ── Info page ── */
+    .page-info .info-body {
+      position: absolute;
+      bottom: 20mm;
+      left: 18mm;
+      right: 18mm;
+      display: grid;
+      grid-template-columns: 120pt 1fr;
+      gap: 0 24pt;
+      align-items: end;
+    }
+    .info-contacts { font-size: 7.5pt; line-height: 1.7; font-weight: 700; }
+    .info-bio { font-size: 7.5pt; line-height: 1.6; max-width: 340pt; }
+    .info-section-label {
+      position: absolute;
+      top: 20mm;
+      left: 18mm;
+      font-size: 7.5pt;
+      color: #111;
+    }
+
+    /* ── Index page ── */
+    .page-index .index-section-label {
+      position: absolute;
+      top: 20mm;
+      left: 18mm;
+      font-size: 7.5pt;
+    }
+    .page-index .index-table {
+      position: absolute;
+      bottom: 20mm;
+      left: 18mm;
+      right: 18mm;
+    }
+    .index-table-header {
+      display: grid;
+      grid-template-columns: 40pt 180pt 1fr 40pt;
+      gap: 0 12pt;
+      font-size: 7.5pt;
+      color: #999;
+      padding-bottom: 4pt;
+      border-bottom: 0.3pt solid #ddd;
+      margin-bottom: 4pt;
+    }
+    .index-table-row {
+      display: grid;
+      grid-template-columns: 40pt 180pt 1fr 40pt;
+      gap: 0 12pt;
+      font-size: 8pt;
+      padding: 4pt 0;
+      border-bottom: 0.3pt solid #eee;
+    }
+    .index-table-row .i-num { color: #999; }
+    .index-table-row .i-title { font-weight: 700; }
+    .index-table-row .i-cat { color: #555; }
+
+    /* ── Project intro page ── */
+    .page-project-intro .proj-cover-area {
+      position: absolute;
+      top: 16mm;
+      left: 18mm;
+      right: 18mm;
+      bottom: 52mm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .page-project-intro .proj-cover-area img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .page-project-intro .proj-text-area {
+      position: absolute;
+      bottom: 20mm;
+      left: 18mm;
+      right: 18mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 24pt;
+      align-items: end;
+    }
+    .proj-description {
+      font-size: 7.5pt;
+      line-height: 1.6;
+      color: #111;
+    }
+    .proj-credits {
+      font-size: 7.5pt;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    /* ── Project full-bleed image pages ── */
+    .page-fullbleed img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* ── Project two-column image page ── */
+    .page-twocol {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding-top: 16mm; /* header space */
+      padding-bottom: 14mm; /* footer space */
+    }
+    .page-twocol img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* ── Project three-column image page ── */
+    .page-threecol {
+      padding-top: 16mm;
+      padding-bottom: 14mm;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1mm;
+    }
+    .page-threecol img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* ── Project grid image page ── */
+    .page-grid {
+      padding-top: 16mm;
+      padding-bottom: 14mm;
+    }
+    .images-grid-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1mm;
+      align-content: flex-start;
+      overflow: hidden;
+    }
+    .images-grid-inner.count-1 img { height: calc(100% - 0mm); width: auto; max-width: 100%; }
+    .images-grid-inner.count-2 img { height: calc(50% - 1mm); width: auto; max-width: 50%; }
+    .images-grid-inner.count-3 img { height: calc(50% - 1mm); width: auto; max-width: 34%; }
+    .images-grid-inner.count-4 img { height: calc(50% - 1mm); width: auto; max-width: 50%; }
+
+    /* Screen preview */
+    @media screen {
+      body { padding: 20px; background: #e0e0e0; }
+      .page {
+        background: #fff;
+        margin: 0 auto 20px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.15);
+        /* approximate A4 landscape at 96dpi */
+        width: 1122px;
+        height: 794px;
+      }
+      .page-footer { bottom: 30px; left: 68px; right: 68px; }
+      .page-header { top: 30px; left: 68px; right: 68px; }
+      .cover-name { bottom: 30px; left: 68px; }
+      .cover-year { bottom: 30px; right: 68px; }
+      .info-section-label { top: 76px; left: 68px; }
+      .page-info .info-body { bottom: 76px; left: 68px; right: 68px; }
+      .page-index .index-section-label { top: 76px; left: 68px; }
+      .page-index .index-table { bottom: 76px; left: 68px; right: 68px; }
+      .page-project-intro .proj-text-area { bottom: 76px; left: 68px; right: 68px; }
+      .page-twocol { padding-top: 60px; padding-bottom: 54px; }
+      .page-threecol { padding-top: 60px; padding-bottom: 54px; }
+      .page-grid { padding-top: 60px; padding-bottom: 54px; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+<script>
+  const projects = [
+    {
+      id: '01', title: 'Authorship', year: '2025',
+      category: 'Editorial design · Book design · Print production',
+      description: 'A 180-page A3 book structured in five chapters, each exploring a different visual language — found images, graphic shapes, typography, statistics and photography — as a means of constructing and representing authorship. The book was entirely designed and printed, from the development of graphic elements to the production process.',
+      credits: 'Mentored by: Jiri Oplatek',
+      base: 'images/project-01/',
+      cover: 'project-01-cover.gif',
+      images: ['01.jpg','02.jpg','03.png','04.png','05.png','06.png','07.png','08.gif','09.jpg','10.jpg','11.jpg','12.jpg']
+    },
+    {
+      id: '02', title: 'InHands', year: '2026',
+      category: 'Research · Interaction design · Web development',
+      description: 'How can digital visual communication systems translate and amplify the emotional perception of hand gestures? Starting from a fascination with non-verbal communication as an emotional carrier, InHands develops a digital system that attempts to translate the expressive capacity of gesture into a coherent visual and sonic experience.',
+      credits: 'Mentored by: Berenice Serra\nOnline web tool: melina121100.github.io/inHands/',
+      base: 'images/project-02/',
+      cover: 'project-02-cover.png',
+      images: ['01.jpg','02.jpg','03.png','04.png','_DSF2692.jpg','_DSF2707.jpg','_DSF2673.jpg']
+    },
+    {
+      id: '03', title: 'Re4d1ng M4ch1in3s', year: '2024',
+      category: 'Design Research · Experimental Typography · Computer Vision · Work in progress',
+      description: 'Re4d1ng M4ch1in3s is an ongoing thesis research project, currently in development and due to be completed in August 2026. The project explores writing through the lens of machine perception. Starting from experiments with asemic writing, the research investigates how Optical Character Recognition (OCR) systems interpret and reconstruct visual language. Rather than treating OCR as a tool for extracting text, the project reuses its perceptual logic as a design material.',
+      credits: 'Documentation: melina121100.github.io/reading-machines/',
+      base: 'images/project-03/',
+      cover: 'development/anti-ocr-hello world (1).jpg',
+      images: ['concept/03.jpg','concept/04.jpg','concept/05.jpg','process/06.jpg','process/07.jpg','process/08.jpg','process/09.png','process/11.jpg','process/12.jpg','process/13.jpg','process/14.jpg','development/0.jpg','development/01.png','development/01 2.png','development/01_loop.png','development/03.png','development/1.jpg','development/02 2.png','development/2.jpeg','development/02.png','development/02_overlayedmanipulation.png','development/9.png','development/11.png']
+    },
+    {
+      id: '04', title: 'Irei — Tikur', year: '2025',
+      category: 'Editorial Design · Mixed media',
+      description: 'Editorial design project developed for the release of Irei / Tikur, an album by composer and sound artist Ivan Liuzzo, published by ZOK Records (Lucerne, Switzerland). The project involved the design of a printed booklet and a JP5 poster included in the cassette edition. The visual identity was conceived to extend the sonic experience into a tactile and editorial format.',
+      credits: 'Music by Ivan Liuzzo\nCover photography by Martha Micali\nPublished by ZOK Records\nFlorian Walter, Felix Nussbaumer',
+      base: 'images/project-04/',
+      cover: 'project_cover.jpg',
+      images: ['10.jpg','11.jpg','12.jpg','13.jpg','14.jpg','15.jpg','17.jpg','02.jpg','01.jpg','16.jpg','03.jpg','09.gif']
+    },
+    {
+      id: '05', title: 'Just a Dream', year: '2025',
+      category: 'Poster Design',
+      description: 'Poster developed during a five-day poster design workshop. The only constraint was the format — 70×100 cm.',
+      credits: '',
+      base: 'images/project-05/',
+      cover: 'project-05-cover.jpg',
+      images: []
+    },
+    {
+      id: '06', title: 'Dal Mio Occhio', year: '2025',
+      category: 'Editorial Design',
+      description: "Dal mio occhio is a 230-page book archiving photographs taken between 1984 and 2022 by Roberto Valdata. Each chapter constitutes an independent visual collection, distinct in form and subject, yet arranged to follow a unified narrative arc. Together they trace fragments of Roberto Valdata's human and visual perspective.",
+      credits: 'Photographs by Roberto Valdata\n1984 — 2022',
+      base: 'images/project-06/',
+      cover: 'project-06-cover.jpg',
+      images: ['02.jpg','03.jpg','04.gif','04.jpg','05.jpg','06.jpg','07.jpg','08.jpg','10.jpeg','11.jpg','12.jpg']
+    },
+    {
+      id: '07', title: 'Jesus Rafael Soto', year: '2025',
+      category: 'Editorial Design',
+      description: 'Jesus Rafael Soto is a 30-page booklet tracing the history and work of the Venezuelan painter and sculptor. The booklet moves through the early stages of his career, his artistic influences and major works, brought together in an A5 format as a tribute to the artist.',
+      credits: '',
+      base: 'images/project-07/',
+      cover: 'project_cover.gif',
+      images: ['01.jpg','02.jpg','07.jpg','11.jpg','12.gif']
+    },
+    {
+      id: '08', title: 'Le Chat Noir', year: '2023',
+      category: 'Brand Identity',
+      description: 'A rebranding project developed from the analysis of Le Chat Noir, a historical brand whose visual identity remains highly recognizable despite its disappearance over time. The project reinterprets and revitalizes the brand visual language through a comprehensive brand book and brand video.',
+      credits: '',
+      base: 'images/project-08/',
+      cover: 'project_cover.jpg',
+      images: ['11.jpg','12.jpg','13.jpg','14.jpg','15.jpg','06.jpg','07.jpg','08.jpg','10.png']
+    },
+    {
+      id: '09', title: 'Pile Dwellings', year: '2023',
+      category: 'Visual Identity',
+      description: 'A complete Visual Identity for the UNESCO World Heritage site — the prehistoric Pile Dwellings on Lake Garda. The identity was expanded through stationery, brochures, posters, gadgets, and ironic postcards designed to raise public awareness about the importance of preserving these largely invisible heritage sites.',
+      credits: 'Politecnico di Milano',
+      base: 'images/project-09/',
+      cover: 'project-09-cover.jpg',
+      images: ['04.png','logo/01.png','logo/02.png','logo/03.png','campagna poster/01.jpg','campagna poster/02.jpg','gadget/01.jpg','gadget/02.jpg','gadget/03.jpg','gadget/04.jpg','stampe/01.jpg','stampe/02.jpg','stampe/03.jpg','stampe/01 copy.jpg','stampe/03 copy.jpg','stampe/04.jpg']
+    }
+  ];
+
+  function isVideo(src) { return /\.(mp4|mov|webm)$/i.test(src); }
+
+  function footer(pageNum) {
+    return `<div class="page-footer"><span>Melina Valdata</span><span>${pageNum}</span></div>`;
+  }
+
+  function header(p) {
+    return `<div class="page-header">
+      <span><span class="h-num">[${p.id}]</span><span class="h-title">${p.title}</span></span>
+      <span class="h-cat">${p.category}</span>
+      <span class="h-year">${p.year}</span>
+    </div>`;
+  }
+
+  function addPage(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    document.body.appendChild(div.firstElementChild);
+  }
+
+  let pageCount = 1;
+
+  // ── Page 1: Cover ──
+  addPage(`
+    <div class="page page-cover">
+      <span class="cover-name">Melina Valdata</span>
+      <span class="cover-year">2026</span>
+    </div>
+  `);
+  pageCount++;
+
+  // ── Page 2: Info ──
+  addPage(`
+    <div class="page page-info">
+      <span class="info-section-label">Info</span>
+      <div class="info-body">
+        <div class="info-contacts">
+          melinavaldata@gmail.com<br>
+          +39 333 400 1130<br>
+          melinavaldata.com
+        </div>
+        <div class="info-bio">
+          I am a graphic designer and visual researcher working across editorial design, visual identities, and digital media. My practice combines research, visual experimentation, and computational tools to investigate how information can be structured, communicated, and experienced.<br><br>
+          Through projects that span both print and digital environments, I explore the relationship between form, content and interaction — trying to translate intangible concepts into visual systems and narrative frameworks.<br><br>
+          I am particularly interested in how communication is produced, interpreted, and transformed across different systems of understanding.
+        </div>
+      </div>
+      ${footer(pageCount)}
+    </div>
+  `);
+  pageCount++;
+
+  // ── Page 3: Index ──
+  const indexRows = projects.map(p => `
+    <div class="index-table-row">
+      <span class="i-num">[${p.id}]</span>
+      <span class="i-title">${p.title}</span>
+      <span class="i-cat">${p.category.split('·')[0].trim()}</span>
+      <span class="i-year">${p.year}</span>
+    </div>
+  `).join('');
+
+  addPage(`
+    <div class="page page-index">
+      <span class="index-section-label">Index</span>
+      <div class="index-table">
+        <div class="index-table-header">
+          <span>No.</span><span>Prj name</span><span>Category</span><span>Year</span>
+        </div>
+        ${indexRows}
+      </div>
+      ${footer(pageCount)}
+    </div>
+  `);
+  pageCount++;
+
+  // ── Project pages ──
+  projects.forEach(p => {
+    const coverSrc = p.base + p.cover;
+    const creditsHtml = p.credits ? p.credits.replace(/\n/g, '<br>') : '';
+
+    // Intro page: cover image top half, text bottom
+    addPage(`
+      <div class="page page-project-intro">
+        ${header(p)}
+        <div class="proj-cover-area">
+          ${!isVideo(coverSrc) ? `<img src="${coverSrc}" alt="">` : ''}
+        </div>
+        <div class="proj-text-area">
+          <div class="proj-description">${p.description}</div>
+          ${creditsHtml ? `<div class="proj-credits">${creditsHtml}</div>` : ''}
+        </div>
+        ${footer(pageCount)}
+      </div>
+    `);
+    pageCount++;
+
+    // Image pages
+    const imgs = p.images.filter(f => !isVideo(f));
+    if (imgs.length === 0) return;
+
+    let i = 0;
+    while (i < imgs.length) {
+      const remaining = imgs.length - i;
+
+      if (remaining === 1) {
+        // Full bleed single image
+        addPage(`
+          <div class="page page-fullbleed">
+            ${header(p)}
+            <img src="${p.base}${imgs[i]}" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;">
+            ${footer(pageCount)}
+          </div>
+        `);
+        i += 1;
+      } else if (remaining === 2) {
+        // Two column
+        addPage(`
+          <div class="page page-twocol">
+            ${header(p)}
+            <img src="${p.base}${imgs[i]}" alt="">
+            <img src="${p.base}${imgs[i+1]}" alt="">
+            ${footer(pageCount)}
+          </div>
+        `);
+        i += 2;
+      } else if (remaining === 3) {
+        // Three column
+        addPage(`
+          <div class="page page-threecol">
+            ${header(p)}
+            <img src="${p.base}${imgs[i]}" alt="">
+            <img src="${p.base}${imgs[i+1]}" alt="">
+            <img src="${p.base}${imgs[i+2]}" alt="">
+            ${footer(pageCount)}
+          </div>
+        `);
+        i += 3;
+      } else {
+        // Grid: max 4 images per page
+        const batch = imgs.slice(i, i + 4);
+        const imgTags = batch.map(f => `<img src="${p.base}${f}" alt="" style="object-fit:contain;object-position:left top;flex:0 0 auto;">`).join('');
+        addPage(`
+          <div class="page page-grid">
+            ${header(p)}
+            <div class="images-grid-inner count-${batch.length}">${imgTags}</div>
+            ${footer(pageCount)}
+          </div>
+        `);
+        i += batch.length;
+      }
+      pageCount++;
+    }
+  });
+</script>
+</body>
+</html>
