@@ -90,8 +90,11 @@
       font-size: 12px; font-weight: 400; letter-spacing: 0.08em;
       color: #ffffff; background: none; border: none; cursor: pointer;
       font-family: Helvetica, Arial, sans-serif; padding: 0; transition: opacity 0.2s; z-index: 10; display: none;
+      mix-blend-mode: difference;
     }
     .audio-toggle:hover { opacity: 0.4; }
+    .slide-counter { position: absolute; bottom: 16px; right: 18px; font-size: 15px; font-weight: 400; color: #ffffff; letter-spacing: 0.08em; pointer-events: none; mix-blend-mode: difference; }
+    .slider-cursor { position: absolute; pointer-events: none; font-size: 18px; line-height: 1; color: #ffffff; transform: translate(-50%, -50%); z-index: 10; display: none; font-family: Helvetica, Arial, sans-serif; mix-blend-mode: difference; }
     #index-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; overflow-y: auto; padding-top: var(--nav-h); }
     #index-overlay.open { display: block; }
     #index-overlay .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 201; }
